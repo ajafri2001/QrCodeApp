@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 
 // ── types ────────────────────────────────────────────────────────────────────
 
-type Ecc = "LOW" | "MEDIUM" | "QUARTILE" | "HIGH"
+type Ecc = "Low" | "Medium" | "Quartile" | "High"
 type OutputFormat = "PNG" | "SVG"
 
 export interface QrFormValues {
@@ -28,7 +28,7 @@ export interface QrFormValues {
 
 const DEFAULT: QrFormValues = {
     url: "",
-    ecc: "MEDIUM",
+    ecc: "Medium",
     format: "PNG",
     scale: 4,
     border: 4,
@@ -279,7 +279,11 @@ export function QrForm({
         const err = validateUrl(values.url)
         setUrlError(err)
         if (err) return
-        onSubmit?.(values)
+
+        const { scale, ...rest } = values
+        const payload = values.format === "SVG" ? rest : values
+
+        onSubmit?.(payload as QrFormValues)
     }
 
     return (
@@ -365,10 +369,10 @@ export function QrForm({
                                 value={values.ecc}
                                 onChange={(v) => set("ecc", v)}
                                 options={[
-                                    { value: "LOW", label: "L · 7%", hint: "Low — 7% recovery" },
-                                    { value: "MEDIUM", label: "M · 15%", hint: "Medium — 15% recovery (default)" },
-                                    { value: "QUARTILE", label: "Q · 25%", hint: "Quartile — 25% recovery" },
-                                    { value: "HIGH", label: "H · 30%", hint: "High — 30% recovery" },
+                                    { value: "Low", label: "L · 7%", hint: "Low — 7% recovery" },
+                                    { value: "Medium", label: "M · 15%", hint: "Medium — 15% recovery (default)" },
+                                    { value: "Quartile", label: "Q · 25%", hint: "Quartile — 25% recovery" },
+                                    { value: "High", label: "H · 30%", hint: "High — 30% recovery" },
                                 ]}
                             />
                         </Field>

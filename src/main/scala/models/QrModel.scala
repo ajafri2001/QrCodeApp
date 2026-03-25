@@ -1,34 +1,17 @@
 package models
 
-import io.circe.{Decoder, Encoder}
-import io.circe.generic.semiauto.*
-import io.nayuki.qrcodegen.QrCode.Ecc
-
-enum Format:
-    case PNG, SVG
-
-object Format:
-    given Decoder[Format] = deriveDecoder
-    given Encoder[Format] = deriveEncoder
-
-enum ErrorCorrection:
-    case Low, Medium, Quartile, High
-
-object ErrorCorrection:
-    given Decoder[ErrorCorrection] = deriveDecoder
-    given Encoder[ErrorCorrection] = deriveEncoder
-
+import com.github.plokhotnyuk.jsoniter_scala.macros.*
+import com.github.plokhotnyuk.jsoniter_scala.core.*
 
 final case class QrModel(
     url: String,
-    errorCorrection: ErrorCorrection,
-    outputFormat: Format,
+    ecc: ErrorCorrection,
+    format: Format,
     scale: Option[Int],
     border: Int,
-    lightColor: Int,
-    darkColor: Int
+    lightColor: String,
+    darkColor: String
 )
 
 object QrModel:
-    given Decoder[QrModel] = deriveDecoder
-    given Encoder[QrModel] = deriveEncoder
+    given JsonValueCodec[QrModel] = JsonCodecMaker.make

@@ -1,7 +1,7 @@
 import type { QrFormValues } from "@/app/QrForm"
 
 export async function generateQr(values: QrFormValues) {
-    const res = await fetch("http://localhost:8080/api/echo", {
+    const res = await fetch("/api/qr", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
