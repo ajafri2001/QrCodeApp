@@ -13,7 +13,10 @@ export async function generateQr(values: QrFormValues) {
         const text = await res.text()
         console.error("API error:", res.status, text)
         throw new Error("Failed")
+    } else {
+        console.log("Nice we got the request")
     }
+
 
     return await res.blob()
 }

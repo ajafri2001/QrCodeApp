@@ -1,14 +1,12 @@
-package json
+package utils
 
 import cats.effect.IO
-import cats.effect.Sync
-import org.http4s.*
-import org.http4s.headers.`Content-Type`
-import org.http4s.MediaType
+import com.github.plokhotnyuk.jsoniter_scala.core._
 import org.http4s.DecodeResult
 import org.http4s.MalformedMessageBodyFailure
-
-import com.github.plokhotnyuk.jsoniter_scala.core.*
+import org.http4s.MediaType
+import org.http4s._
+import org.http4s.headers.`Content-Type`
 
 object JsoniterCodecs:
     given [A: JsonValueCodec]: EntityEncoder[IO, A] =

@@ -1,16 +1,13 @@
 import cats.effect.*
+import cats.syntax.semigroupk.*
 import com.comcast.ip4s.*
 import org.http4s.*
 import org.http4s.ember.server.EmberServerBuilder
-import org.typelevel.log4cats.LoggerFactory
-import org.typelevel.log4cats.slf4j.Slf4jFactory
-import routes.Routes
-import cats.syntax.semigroupk.*
 import org.http4s.server.staticcontent.*
+import routes.Routes
+import utils.Logger.given
 
 object Main extends IOApp:
-
-    given LoggerFactory[IO] = Slf4jFactory.create[IO]
 
     def run(args: List[String]): IO[ExitCode] =
         for

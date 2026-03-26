@@ -2,6 +2,14 @@ import scala.sys.process.*
 
 scalaVersion := "3.8.2"
 
+Global / semanticdbEnabled := true
+scalacOptions ++= Seq(
+    "-deprecation",
+    "-unchecked",
+    "-feature",
+    "-Wunused:all"
+)
+
 val http4sVersion = "1.0.0-M45"
 val circeVersion  = "0.14.15"
 

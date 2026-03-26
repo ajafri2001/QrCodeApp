@@ -1,16 +1,14 @@
 package service
 
-import io.nayuki.qrcodegen.*
-import java.awt.image.BufferedImage
-import javax.imageio.ImageIO
+import io.nayuki.qrcodegen._
 import models.QrModel
-import models.ErrorCorrection
-import QrCode.*
-import service.QrCodeGen.*
+import service.QrCodeGen._
 
-final class QrCodeGen private (qr: QrCode, scale: Option[Int], border: Int, lightColor: Int, darkColor: Int):
+import java.awt.image.BufferedImage
+
+final class QrCodeGen private (qr: QrCode, scale: Option[Int], border: Int, lightColor: String, darkColor: String):
     def renderImage: BufferedImage =
-        QrCodeGen.renderImage(qr, scale.get, border, lightColor, darkColor)
+        QrCodeGen.renderImage(qr, scale.get, border, parseHexColor(lightColor), parseHexColor(darkColor))
 
     def renderSvg: String =
         QrCodeGen.renderSvgString(qr, border, lightColor, darkColor)
@@ -21,11 +19,11 @@ object QrCodeGen:
             qr = QrCode.encodeText(model.url, model.ecc.toJavaEcc),
             scale = model.scale,
             border = model.border,
-            lightColor = parseHexColor(model.lightColor),
-            darkColor = parseHexColor(model.darkColor)
+            lightColor = model.lightColor,
+            darkColor = model.darkColor
         )
 
-    private def renderImage(qr: QrCode, scale: Int, border: Int, lightColor: Int = 0xffffff, darkColor: Int = 0x000000): BufferedImage =
+    private def renderImage(qr: QrCode, scale: Int, border: Int, lightColor: Int, darkColor: Int): BufferedImage =
         val size   = (qr.size + border * 2) * scale
         val result = BufferedImage(size, size, BufferedImage.TYPE_INT_RGB)
 
@@ -38,7 +36,7 @@ object QrCodeGen:
         pixels.foreach((x, y, rgb) => result.setRGB(x, y, rgb))
         result
 
-    private def renderSvgString(qr: QrCode, border: Int, lightColor: Int = 0xffffff, darkColor: Int = 0x000000): String =
+    private def renderSvgString(qr: QrCode, border: Int, lightColor: String, darkColor: String): String =
         val brd         = border.toLong
         val size        = qr.size + brd * 2
         val darkModules =
