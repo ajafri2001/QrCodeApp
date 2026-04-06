@@ -1,6 +1,6 @@
 package models
 
-import com.github.plokhotnyuk.jsoniter_scala.core._
+import com.github.plokhotnyuk.jsoniter_scala.core.*
 
 enum Format:
     case PNG, SVG
