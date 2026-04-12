@@ -33,8 +33,8 @@ export function LoginForm({
         const formData = new FormData(e.currentTarget)
 
         const payload = {
-            email: formData.get("email"),
-            password: formData.get("password"),
+            email: formData.get("email") as string,
+            password: formData.get("password") as string,
         }
 
         try {
@@ -52,6 +52,8 @@ export function LoginForm({
                 setError(data.message || "Login failed")
                 return
             }
+
+            window.location.href = "/"
 
         } catch (err) {
             setError("Network error")

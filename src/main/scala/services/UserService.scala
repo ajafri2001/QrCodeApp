@@ -5,9 +5,7 @@ import models.*
 import cats.effect.*
 import com.github.t3hnar.bcrypt.*
 
-class UserService(userQueries: UserQueries):
-
-    val sessionStore = SessionStore()
+class UserService(userQueries: UserQueries, sessionStore: SessionStore):
 
     def registerUser(signup: UserSignup): IO[Unit] =
         for
