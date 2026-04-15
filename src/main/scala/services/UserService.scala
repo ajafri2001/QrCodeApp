@@ -4,6 +4,7 @@ import db.UserQueries
 import models.*
 import cats.effect.*
 import com.github.t3hnar.bcrypt.*
+import org.http4s.Request
 
 class UserService(userQueries: UserQueries, sessionStore: SessionStore):
 
@@ -27,3 +28,8 @@ class UserService(userQueries: UserQueries, sessionStore: SessionStore):
                         sessionStore.create(user).map(Right(_))
                     else IO.pure(Left("Invalid email or password"))
         yield result
+
+    def getUserFromRequest(req: Request[IO]): IO[Option[User]] =
+        req.cookies.find(_.name == "session_id") match
+            case Some(cookie) => sessionStore.get(cookie.content)
+            case None         => IO.pure(None)

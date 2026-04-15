@@ -8,9 +8,10 @@ import routes.Routes
 import utils.Logger.given
 import doobie.util.transactor.Transactor
 import doobie.util.log.LogHandler
-import db.UserQueries
+import db.*
 import services.UserService
 import services.QrService
+import services.SessionStore
 
 object Main extends IOApp:
 
@@ -23,12 +24,14 @@ object Main extends IOApp:
     )
 
     def run(args: List[String]): IO[ExitCode] =
+        val userQueries = UserQueries(xa)
+        val userService = UserService(userQueries, SessionStore())
+        val qrQueries   = QrQueries(xa)
+        val qrService   = QrService(qrQueries)
+        val routes      = Routes(userService, qrService)
+
         for
-            _ <- Database.init(xa)
-            userQueries = UserQueries(xa)
-            userService = UserService(userQueries)
-            qrService   = QrService()
-            routes      = Routes(userService, qrService)
+            _            <- Database.init(xa)
             staticRoutes <- resourceServiceBuilder[IO]("/dist").toRoutes
             _            <- EmberServerBuilder
                 .default[IO]

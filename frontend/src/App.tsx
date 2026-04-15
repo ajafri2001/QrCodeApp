@@ -19,7 +19,7 @@ export function App() {
             <Routes>
                 <Route path="/" element={<QrPageLayout />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<SignUp />} />
+                <Route path="/signup" element={<SignUp />} />
             </Routes>
         </>
     )

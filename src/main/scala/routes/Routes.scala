@@ -3,8 +3,10 @@ package routes
 import cats.effect.*
 import cats.syntax.all.*
 import models.*
-import org.http4s.*
+import org.typelevel.ci.CIString
 import utils.JsoniterCodecs.given
+import org.http4s.headers.*
+import org.http4s.*
 
 import cats.data.Kleisli
 import cats.data.OptionT
@@ -13,9 +15,19 @@ import org.http4s.dsl.Http4sDsl
 
 class Routes(userService: UserService, qrService: QrService) extends Http4sDsl[IO]:
 
+    private def getUser(req: Request[IO]): IO[Option[User]] = userService.getUserFromRequest(req)
+
     private val apiRoutes: HttpRoutes[IO] =
 
         HttpRoutes.of[IO]:
+
+            case req @ GET -> Root / "api" / "me" =>
+                for
+                    userOpt <- getUser(req)
+                    resp    <- userOpt match
+                        case Some(user) => Ok(user.name) // or return JSON later
+                        case None       => Forbidden()
+                yield resp
 
             case req @ POST -> Root / "api" / "login" =>
                 for
@@ -42,14 +54,64 @@ class Routes(userService: UserService, qrService: QrService) extends Http4sDsl[I
                     resp   <- Ok()
                 yield resp
 
-            case req @ POST -> Root / "api" / "qr" =>
+            case req @ POST -> Root / "api" / "getQR" =>
                 for
-                    model                <- req.as[QrModel]
-                    (bytes, contentType) <- qrService.generate(model)
-                    res                  <- Ok(bytes).map(_.withContentType(contentType))
-                yield res
+                    userOpt <- getUser(req)
+                    resp    <- userOpt match
+                        case Some(user) =>
+                            for
+                                model       <- req.as[QrModel]
+                                (bytes, ct) <- qrService.generate(user, model)
+                                res         <- Ok(bytes).map(_.withContentType(ct))
+                            yield res
 
-    private val protectedRoutes = ???
+                        case None =>
+                            Forbidden()
+                yield resp
+
+            case req @ GET -> Root / "api" / "getHistory" =>
+                for
+                    userOpt <- getUser(req)
+                    resp    <- userOpt match
+                        case Some(user) =>
+                            qrService.getHistory(user).flatMap(Ok(_))
+
+                        case None =>
+                            Forbidden()
+                yield resp
+
+            case req @ GET -> Root / "api" / "qr" / UUIDVar(id) =>
+                for
+                    userOpt <- getUser(req)
+                    resp    <- userOpt match
+                        case Some(user) =>
+                            qrService.getQr(user, id).flatMap {
+                                case Some((bytes, format)) =>
+
+                                    val contentType = format match
+                                        case Format.PNG => `Content-Type`(MediaType.image.png)
+                                        case Format.SVG => `Content-Type`(MediaType.image.`svg+xml`)
+
+                                    val filename = s"qr-$id.${format.toString.toLowerCase}"
+
+                                    Ok(bytes)
+                                        .map(
+                                            _.withContentType(contentType)
+                                                .putHeaders(
+                                                    Header.Raw(
+                                                        CIString("Content-Disposition"),
+                                                        s"""attachment; filename="$filename""""
+                                                    )
+                                                )
+                                        )
+
+                                case None =>
+                                    NotFound()
+                            }
+
+                        case None =>
+                            Forbidden()
+                yield resp
 
     private val spaRoutes: HttpRoutes[IO] =
         HttpRoutes.of[IO]:

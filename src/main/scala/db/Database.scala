@@ -1,4 +1,5 @@
 import cats.effect.IO
+import cats.implicits.*
 import doobie.*
 import doobie.implicits.*
 
@@ -15,4 +16,17 @@ object Database:
                   )
                """.update.run
 
-        createUsers.transact(xa).void
+        val createQrRecords =
+            sql"""
+                  CREATE TABLE IF NOT EXISTS qr_records (
+                    id           TEXT PRIMARY KEY,
+                    user_id      TEXT NOT NULL,
+                    original_url TEXT NOT NULL,
+                    mime_type    TEXT NOT NULL,
+                    data         BLOB NOT NULL,
+                    created_at   TIMESTAMP NOT NULL,
+                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                  )
+               """.update.run
+
+        (createUsers >> createQrRecords).transact(xa).void

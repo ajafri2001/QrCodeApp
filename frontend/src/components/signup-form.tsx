@@ -15,10 +15,15 @@ import {
     FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { useRedirectIfAuth } from "@/lib/api"
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+
+    const load = useRedirectIfAuth()
+    if (load) return null
+
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
