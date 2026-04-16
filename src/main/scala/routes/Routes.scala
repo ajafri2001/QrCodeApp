@@ -1,31 +1,32 @@
 package routes
 
+import cats.data.Kleisli
+import cats.data.OptionT
 import cats.effect.*
 import cats.syntax.all.*
 import models.*
-import org.typelevel.ci.CIString
-import utils.JsoniterCodecs.given
-import org.http4s.headers.*
 import org.http4s.*
-
-import cats.data.Kleisli
-import cats.data.OptionT
-import services.*
 import org.http4s.dsl.Http4sDsl
+import org.http4s.headers.*
+import org.typelevel.ci.CIString
+import services.*
+import utils.JsoniterCodecs.given
 
 class Routes(userService: UserService, qrService: QrService) extends Http4sDsl[IO]:
 
-    private def getUser(req: Request[IO]): IO[Option[User]] = userService.getUserFromRequest(req)
+    // Helper to extract authenticated user from request (via session/cookie/etc.)
+    private def getUser(req: Request[IO]): IO[Option[User]] =
+        userService.getUserFromRequest(req)
 
+    // API endpoints
     private val apiRoutes: HttpRoutes[IO] =
-
         HttpRoutes.of[IO]:
 
             case req @ GET -> Root / "api" / "me" =>
                 for
                     userOpt <- getUser(req)
                     resp    <- userOpt match
-                        case Some(user) => Ok(user.name) // or return JSON later
+                        case Some(user) => Ok(user.name)
                         case None       => Forbidden()
                 yield resp
 
@@ -91,22 +92,22 @@ class Routes(userService: UserService, qrService: QrService) extends Http4sDsl[I
                             qrService.getQr(user, id).flatMap {
                                 case Some((bytes, format)) =>
 
+                                    // Set correct content type based on QR format
                                     val contentType = format match
                                         case Format.PNG => `Content-Type`(MediaType.image.png)
                                         case Format.SVG => `Content-Type`(MediaType.image.`svg+xml`)
 
                                     val filename = s"qr-$id.${format.toString.toLowerCase}"
 
-                                    Ok(bytes)
-                                        .map(
-                                            _.withContentType(contentType)
-                                                .putHeaders(
-                                                    Header.Raw(
-                                                        CIString("Content-Disposition"),
-                                                        s"""attachment; filename="$filename""""
-                                                    )
+                                    Ok(bytes).map(
+                                        _.withContentType(contentType)
+                                            .putHeaders(
+                                                Header.Raw(
+                                                    CIString("Content-Disposition"),
+                                                    s"""attachment; filename="$filename""""
                                                 )
-                                        )
+                                            )
+                                    )
 
                                 case None =>
                                     NotFound()
@@ -126,6 +127,7 @@ class Routes(userService: UserService, qrService: QrService) extends Http4sDsl[I
                             Forbidden()
                 yield resp
 
+    // SPA fallback (serves frontend)
     private val spaRoutes: HttpRoutes[IO] =
         HttpRoutes.of[IO]:
             case req @ GET -> _ =>
@@ -133,4 +135,6 @@ class Routes(userService: UserService, qrService: QrService) extends Http4sDsl[I
                     .fromResource("/dist/index.html", Some(req))
                     .getOrElseF(NotFound())
 
-    val routes: HttpRoutes[IO] = apiRoutes <+> spaRoutes // Order is important here
+    // Combined routes (API first, then SPA fallback)
+    val routes: HttpRoutes[IO] =
+        apiRoutes <+> spaRoutes

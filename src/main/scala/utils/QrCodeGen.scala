@@ -6,14 +6,31 @@ import utils.QrCodeGen.*
 
 import java.awt.image.BufferedImage
 
-final class QrCodeGen private (qr: QrCode, scale: Option[Int], border: Int, lightColor: String, darkColor: String):
-    def renderImage: BufferedImage =
-        QrCodeGen.renderImage(qr, scale.get, border, parseHexColor(lightColor), parseHexColor(darkColor))
+final class QrCodeGen private (
+    qr: QrCode,
+    scale: Option[Int],
+    border: Int,
+    lightColor: String,
+    darkColor: String
+):
 
+    // Render QR code as BufferedImage (PNG path)
+    def renderImage: BufferedImage =
+        QrCodeGen.renderImage(
+            qr,
+            scale.get,
+            border,
+            parseHexColor(lightColor),
+            parseHexColor(darkColor)
+        )
+
+    // Render QR code as SVG string
     def renderSvg: String =
         QrCodeGen.renderSvgString(qr, border, lightColor, darkColor)
 
 object QrCodeGen:
+
+    // Build QR generator from domain model
     def apply(model: QrModel): QrCodeGen =
         new QrCodeGen(
             qr = QrCode.encodeText(model.url, model.ecc.toJavaEcc),
@@ -23,7 +40,14 @@ object QrCodeGen:
             darkColor = model.darkColor
         )
 
-    private def renderImage(qr: QrCode, scale: Int, border: Int, lightColor: Int, darkColor: Int): BufferedImage =
+    // Rasterize QR code into an RGB image
+    private def renderImage(
+        qr: QrCode,
+        scale: Int,
+        border: Int,
+        lightColor: Int,
+        darkColor: Int
+    ): BufferedImage =
         val size   = (qr.size + border * 2) * scale
         val result = BufferedImage(size, size, BufferedImage.TYPE_INT_RGB)
 
@@ -36,9 +60,17 @@ object QrCodeGen:
         pixels.foreach((x, y, rgb) => result.setRGB(x, y, rgb))
         result
 
-    private def renderSvgString(qr: QrCode, border: Int, lightColor: String, darkColor: String): String =
-        val brd         = border.toLong
-        val size        = qr.size + brd * 2
+    // Render QR code as SVG path (vector format)
+    private def renderSvgString(
+        qr: QrCode,
+        border: Int,
+        lightColor: String,
+        darkColor: String
+    ): String =
+        val brd  = border.toLong
+        val size = qr.size + brd * 2
+
+        // Each "true module" becomes a small SVG path rectangle
         val darkModules =
             for
                 y <- 0 until qr.size
@@ -47,12 +79,13 @@ object QrCodeGen:
             yield s"M${x + brd},${y + brd}h1v1h-1z"
 
         s"""<?xml version="1.0" encoding="UTF-8"?>
-         |<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-         |<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 $size $size" stroke="none">
-         |\t<rect width="100%" height="100%" fill="$lightColor"/>
-         |\t<path d="${darkModules.mkString(" ")}" fill="$darkColor"/>
-         |</svg>
-         |""".stripMargin
+           |<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+           |<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 $size $size" stroke="none">
+           |\t<rect width="100%" height="100%" fill="$lightColor"/>
+           |\t<path d="${darkModules.mkString(" ")}" fill="$darkColor"/>
+           |</svg>
+           |""".stripMargin
 
+    // Convert hex color string (#RRGGBB) into integer RGB
     private def parseHexColor(hex: String): Int =
         Integer.parseInt(hex.replace("#", ""), 16)

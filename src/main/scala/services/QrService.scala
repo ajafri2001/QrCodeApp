@@ -15,6 +15,7 @@ import java.time.Instant
 
 final class QrService(qrQueries: QrQueries):
 
+    // Generate QR code (PNG or SVG), persist it, and return bytes + content type
     def generate(user: User, model: QrModel): IO[(Array[Byte], `Content-Type`)] =
         val renderer = QrCodeGen(model)
 
@@ -33,6 +34,7 @@ final class QrService(qrQueries: QrQueries):
         for
             (bytes, contentType) <- generateBytes
 
+            // DB record for persistence + history
             record = QrRecord(
                 id = UUID.randomUUID(),
                 userId = user.id,
@@ -45,19 +47,21 @@ final class QrService(qrQueries: QrQueries):
             _ <- qrQueries.insert(record)
         yield (bytes, contentType)
 
+    // Return QR history metadata (no binary payload)
     def getHistory(user: User): IO[List[QrRecordView]] =
-        for
-            records <- qrQueries.findByUser(user.id)
-        yield records.map: r =>
-            QrRecordView(
-                id = r.id,
-                originalUrl = r.originalUrl,
-                mimeType = r.mimeType,
-                createdAt = r.createdAt
-            )
+        qrQueries.findByUser(user.id).map: records =>
+            records.map: r =>
+                QrRecordView(
+                    id = r.id,
+                    originalUrl = r.originalUrl,
+                    mimeType = r.mimeType,
+                    createdAt = r.createdAt
+                )
 
+    // Fetch a specific QR code belonging to a user
     def getQr(user: User, id: UUID): IO[Option[(Array[Byte], Format)]] =
         qrQueries.findById(id, user.id).map(_.map(r => (r.image, r.mimeType)))
 
+    // Delete QR record (scoped to user)
     def delete(rowId: UUID, userId: UUID): IO[Unit] =
         qrQueries.delete(rowId, userId)

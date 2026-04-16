@@ -5,7 +5,10 @@ import doobie.implicits.*
 
 object Database:
 
+    // Initializes database schema (idempotent)
     def init(xa: Transactor[IO]): IO[Unit] =
+
+        // Users table: core authentication data
         val createUsers =
             sql"""
                   CREATE TABLE IF NOT EXISTS users (
@@ -16,6 +19,7 @@ object Database:
                   )
                """.update.run
 
+        // QR records table: stores generated QR codes per user
         val createQrRecords =
             sql"""
                   CREATE TABLE IF NOT EXISTS qr_records (
@@ -29,4 +33,5 @@ object Database:
                   )
                """.update.run
 
+        // Execute schema creation in sequence
         (createUsers >> createQrRecords).transact(xa).void

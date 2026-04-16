@@ -9,11 +9,14 @@ import org.http4s.*
 import org.http4s.headers.`Content-Type`
 
 object JsoniterCodecs:
+
+    // HTTP4s EntityEncoder
     given [A: JsonValueCodec]: EntityEncoder[IO, A] =
         EntityEncoder.byteArrayEncoder
             .contramap[A](writeToArray(_))
             .withContentType(`Content-Type`(MediaType.application.json))
 
+    // HTTP4s EntityDecoder
     given [A: JsonValueCodec]: EntityDecoder[IO, A] =
         EntityDecoder.decodeBy(MediaType.application.json): msg =>
             DecodeResult:

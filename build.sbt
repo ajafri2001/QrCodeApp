@@ -2,6 +2,8 @@ import scala.sys.process.*
 
 scalaVersion := "3.8.2"
 
+assembly / assemblyJarName := "qrcode-app.jar"
+
 Global / semanticdbEnabled := true
 scalacOptions ++= Seq(
     "-deprecation",

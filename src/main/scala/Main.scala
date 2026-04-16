@@ -15,8 +15,10 @@ import services.SessionStore
 
 object Main extends IOApp:
 
+    // Doobie SQL logging (JDK backend)
     val logHandler = LogHandler.jdkLogHandler[IO]
 
+    // SQLite transactor (file-based DB)
     val xa = Transactor.fromDriverManager[IO](
         "org.sqlite.JDBC",
         "jdbc:sqlite:sqlite.db",
@@ -24,20 +26,30 @@ object Main extends IOApp:
     )
 
     def run(args: List[String]): IO[ExitCode] =
+        // DB access layer
         val userQueries = UserQueries(xa)
-        val userService = UserService(userQueries, SessionStore())
         val qrQueries   = QrQueries(xa)
+
+        // Business services
+        val userService = UserService(userQueries, SessionStore())
         val qrService   = QrService(qrQueries)
-        val routes      = Routes(userService, qrService)
+
+        // HTTP routes
+        val routes = Routes(userService, qrService)
 
         for
-            _            <- Database.init(xa)
+            // Ensure schema exists
+            _ <- Database.init(xa)
+
+            // Static frontend (e.g. /dist build output)
             staticRoutes <- resourceServiceBuilder[IO]("/dist").toRoutes
-            _            <- EmberServerBuilder
+
+            // Start HTTP server
+            _ <- EmberServerBuilder
                 .default[IO]
                 .withHost(host"0.0.0.0")
                 .withPort(port"3000")
-                .withHttpApp((staticRoutes <+> routes.routes).orNotFound) // order is important
+                .withHttpApp((staticRoutes <+> routes.routes).orNotFound)
                 .build
                 .useForever
         yield ExitCode.Success

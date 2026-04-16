@@ -7,5 +7,9 @@ import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 object Logger:
-    given LoggerFactory[IO]  = Slf4jFactory.create[IO]
+
+    // Log4cats SLF4J-backed logger factory for IO
+    given LoggerFactory[IO] = Slf4jFactory.create[IO]
+
+    // Default implicit logger instance for application-wide use
     given logger: Logger[IO] = Slf4jLogger.getLogger[IO]
