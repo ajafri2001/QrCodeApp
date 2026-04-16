@@ -1,9 +1,10 @@
 package models
 
-import java.time.Instant as Date
+import com.github.plokhotnyuk.jsoniter_scala.core._
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+
+import java.time.{Instant => Date}
 import java.util.UUID
-import com.github.plokhotnyuk.jsoniter_scala.core.*
-import com.github.plokhotnyuk.jsoniter_scala.macros.*
 
 // Persisted QR record (stored in DB, includes binary image)
 final case class QrRecord(

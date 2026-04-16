@@ -2,14 +2,14 @@ package routes
 
 import cats.data.Kleisli
 import cats.data.OptionT
-import cats.effect.*
-import cats.syntax.all.*
-import models.*
-import org.http4s.*
+import cats.effect._
+import cats.syntax.all._
+import models._
+import org.http4s._
 import org.http4s.dsl.Http4sDsl
-import org.http4s.headers.*
+import org.http4s.headers._
 import org.typelevel.ci.CIString
-import services.*
+import services._
 import utils.JsoniterCodecs.given
 
 class Routes(userService: UserService, qrService: QrService) extends Http4sDsl[IO]:

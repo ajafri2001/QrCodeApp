@@ -61,7 +61,7 @@ export function LoginForm({
             window.location.href = "/"
 
         } catch (err) {
-            setError("Network error")
+            setError("Login Failed")
         } finally {
             setLoading(false)
         }

@@ -1,6 +1,6 @@
 package models
 
-import com.github.plokhotnyuk.jsoniter_scala.core.*
+import com.github.plokhotnyuk.jsoniter_scala.core._
 
 // Output format for generated QR codes
 enum Format:

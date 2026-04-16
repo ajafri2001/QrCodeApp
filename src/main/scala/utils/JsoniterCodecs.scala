@@ -1,11 +1,11 @@
 package utils
 
 import cats.effect.IO
-import com.github.plokhotnyuk.jsoniter_scala.core.*
+import com.github.plokhotnyuk.jsoniter_scala.core._
 import org.http4s.DecodeResult
 import org.http4s.MalformedMessageBodyFailure
 import org.http4s.MediaType
-import org.http4s.*
+import org.http4s._
 import org.http4s.headers.`Content-Type`
 
 object JsoniterCodecs:

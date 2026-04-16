@@ -1,17 +1,16 @@
 package services
 
-import cats.effect.*
-
-import models.*
-import javax.imageio.ImageIO
-import utils.*
-import org.http4s.headers.`Content-Type`
-import java.io.ByteArrayOutputStream
-import org.http4s.MediaType
+import cats.effect._
 import db.QrQueries
+import models._
+import org.http4s.MediaType
+import org.http4s.headers.`Content-Type`
+import utils._
 
-import java.util.UUID
+import java.io.ByteArrayOutputStream
 import java.time.Instant
+import java.util.UUID
+import javax.imageio.ImageIO
 
 final class QrService(qrQueries: QrQueries):
 

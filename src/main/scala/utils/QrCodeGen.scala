@@ -1,8 +1,8 @@
 package utils
 
-import io.nayuki.qrcodegen.*
+import io.nayuki.qrcodegen._
 import models.QrModel
-import utils.QrCodeGen.*
+import utils.QrCodeGen._
 
 import java.awt.image.BufferedImage
 

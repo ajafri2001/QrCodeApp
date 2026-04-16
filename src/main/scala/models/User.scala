@@ -1,9 +1,9 @@
 package models
 
-import java.util.UUID
-import com.github.plokhotnyuk.jsoniter_scala.core.*
-import com.github.plokhotnyuk.jsoniter_scala.macros.*
+import com.github.plokhotnyuk.jsoniter_scala.core._
+import com.github.plokhotnyuk.jsoniter_scala.macros._
 
+import java.util.UUID
 import scala.util.matching.Regex
 
 // Core user entity stored in DB

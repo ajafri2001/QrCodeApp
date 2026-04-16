@@ -1,10 +1,13 @@
 package db
 
-import doobie.*
-import doobie.implicits.*
+import cats.effect._
+import doobie._
+import doobie.implicits._
 import doobie.util.transactor.Transactor
-import cats.effect.*
-import models.{Email, Password, User}
+import models.Email
+import models.Password
+import models.User
+
 import java.util.UUID
 
 class UserQueries(xa: Transactor[IO]):

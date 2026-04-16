@@ -1,8 +1,9 @@
 package services
 
-import cats.effect.*
+import cats.effect._
 import cats.effect.std.UUIDGen
 import models.User
+
 import scala.collection.concurrent.TrieMap
 
 class SessionStore:

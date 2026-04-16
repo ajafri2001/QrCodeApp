@@ -1,7 +1,9 @@
+package db
+
 import cats.effect.IO
-import cats.implicits.*
-import doobie.*
-import doobie.implicits.*
+import cats.implicits._
+import doobie._
+import doobie.implicits._
 
 object Database:
 

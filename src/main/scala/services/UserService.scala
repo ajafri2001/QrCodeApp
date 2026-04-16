@@ -1,9 +1,9 @@
 package services
 
+import cats.effect._
+import com.github.t3hnar.bcrypt._
 import db.UserQueries
-import models.*
-import cats.effect.*
-import com.github.t3hnar.bcrypt.*
+import models._
 import org.http4s.Request
 
 class UserService(userQueries: UserQueries, sessionStore: SessionStore):

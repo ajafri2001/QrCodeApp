@@ -67,7 +67,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
             alert("Account created successfully!")
             window.location.href = "/"
         } catch (err) {
-            setError("Network error")
+            setError("Signup failed")
         } finally {
             setLoading(false)
         }

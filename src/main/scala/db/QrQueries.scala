@@ -1,12 +1,14 @@
 package db
 
-import doobie.*
-import doobie.implicits.*
+import cats.effect._
+import doobie._
+import doobie.implicits._
 import doobie.util.transactor.Transactor
-import cats.effect.*
-import java.util.UUID
+import models.Format
+import models.QrRecord
+
 import java.time.Instant
-import models.{Format, QrRecord}
+import java.util.UUID
 
 final class QrQueries(xa: Transactor[IO]):
 

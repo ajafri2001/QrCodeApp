@@ -25,7 +25,8 @@ libraryDependencies ++= Seq(
     "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.38.9" % "compile-internal",
     "org.tpolecat"                          %% "doobie-core"           % "1.0.0-RC12",
     "org.xerial"                             % "sqlite-jdbc"           % "3.51.3.0",
-    "com.github.t3hnar"                      % "scala-bcrypt_2.13"     % "4.3.0"
+    "com.github.t3hnar"                      % "scala-bcrypt_2.13"     % "4.3.0",
+    "org.typelevel"                         %% "munit-cats-effect"     % "2.2.0"  % Test
 )
 
 lazy val buildFrontend = taskKey[Unit]("Build frontend")
