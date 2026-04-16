@@ -33,3 +33,8 @@ class UserService(userQueries: UserQueries, sessionStore: SessionStore):
         req.cookies.find(_.name == "session_id") match
             case Some(cookie) => sessionStore.get(cookie.content)
             case None         => IO.pure(None)
+
+    def logOutUser(req: Request[IO]): IO[Unit] =
+        req.cookies.find(_.name == "session_id") match
+            case Some(cookie) => sessionStore.delete(cookie.content)
+            case None         => IO.unit

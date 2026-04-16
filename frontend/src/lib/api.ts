@@ -2,7 +2,7 @@ import type { QrFormValues } from "@/app/QrForm"
 import { useEffect, useState } from "react"
 
 export async function generateQr(values: QrFormValues) {
-    const res = await fetch("/api/getQr", {
+    const res = await fetch("/api/getQR", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -54,4 +54,15 @@ export function useRedirectIfAuth() {
     }, [])
 
     return loading
+}
+
+export async function deleteQr(id: string) {
+    const res = await fetch(`/api/qr/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+    })
+
+    if (!res.ok) {
+        throw new Error('Failed to delete')
+    }
 }

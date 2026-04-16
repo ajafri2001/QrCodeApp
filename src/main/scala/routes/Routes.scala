@@ -54,20 +54,23 @@ class Routes(userService: UserService, qrService: QrService) extends Http4sDsl[I
                     resp   <- Ok()
                 yield resp
 
-            case req @ POST -> Root / "api" / "getQR" =>
+            case req @ POST -> Root / "api" / "logout" =>
                 for
-                    userOpt <- getUser(req)
-                    resp    <- userOpt match
-                        case Some(user) =>
-                            for
-                                model       <- req.as[QrModel]
-                                (bytes, ct) <- qrService.generate(user, model)
-                                res         <- Ok(bytes).map(_.withContentType(ct))
-                            yield res
+                    _   <- userService.logOutUser(req)
+                    res <- Ok()
+                yield res
 
-                        case None =>
-                            Forbidden()
-                yield resp
+            case req @ POST -> Root / "api" / "getQR" =>
+                getUser(req).flatMap:
+                    case Some(user) =>
+                        for
+                            model       <- req.as[QrModel]
+                            (bytes, ct) <- qrService.generate(user, model)
+                            res         <- Ok(bytes).map(_.withContentType(ct))
+                        yield res
+
+                    case None =>
+                        Forbidden()
 
             case req @ GET -> Root / "api" / "getHistory" =>
                 for
@@ -80,7 +83,7 @@ class Routes(userService: UserService, qrService: QrService) extends Http4sDsl[I
                             Forbidden()
                 yield resp
 
-            case req @ GET -> Root / "api" / "qr" / UUIDVar(id) =>
+            case req @ GET -> Root / "api" / "download" / UUIDVar(id) =>
                 for
                     userOpt <- getUser(req)
                     resp    <- userOpt match
@@ -109,6 +112,16 @@ class Routes(userService: UserService, qrService: QrService) extends Http4sDsl[I
                                     NotFound()
                             }
 
+                        case None =>
+                            Forbidden()
+                yield resp
+
+            case req @ DELETE -> Root / "api" / "qr" / UUIDVar(id) =>
+                for
+                    userOpt <- getUser(req)
+                    resp    <- userOpt match
+                        case Some(user) =>
+                            qrService.delete(id, user.id) *> NoContent()
                         case None =>
                             Forbidden()
                 yield resp

@@ -4,15 +4,24 @@ import { useState } from "react";
 import { QrForm, type QrFormValues } from "./QrForm";
 import { generateQr, useAuthGuard } from "@/lib/api";
 import DataTable from "./DataTable";
+import { logout } from "@/lib/utils";
+
+
+export const handleLogout = async () => {
+    await logout()
+    window.location.replace("/login")
+}
 
 export default function Page() {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const loading = useAuthGuard()
     if (loading) return null
 
     const handleSubmit = async (values: QrFormValues) => {
         const blob = await generateQr(values);
+
         if (imageUrl) URL.revokeObjectURL(imageUrl);
 
         const typedBlob = blob.type
@@ -21,6 +30,8 @@ export default function Page() {
 
         const url = URL.createObjectURL(typedBlob);
         setImageUrl(url);
+
+        setRefreshKey(prev => prev + 1);
     };
 
     return (
@@ -50,7 +61,7 @@ export default function Page() {
             {/* BOTTOM: centered table */}
             <div className="w-full flex justify-center py-10">
                 <div className="w-full max-w-4xl">
-                    <DataTable />
+                    <DataTable refreshKey={refreshKey} onRefresh={() => setRefreshKey(k => k + 1)} />
                 </div>
             </div>
 

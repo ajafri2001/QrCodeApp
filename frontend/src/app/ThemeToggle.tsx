@@ -25,3 +25,17 @@ export function ThemeToggle() {
         </div>
     )
 }
+
+export function AppHeader({ onLogout }: { onLogout: () => void }) {
+    return (
+        <div className="fixed top-4 right-16 z-50">
+            <Button
+                onClick={onLogout}
+                variant="outline"
+                className="shadow-md"
+            >
+                Logout
+            </Button>
+        </div>
+    )
+}

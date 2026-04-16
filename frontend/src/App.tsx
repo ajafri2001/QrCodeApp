@@ -1,12 +1,13 @@
 import Login from "./app/Login";
-import Page from "./app/Page"
+import Page, { handleLogout } from "./app/Page"
 import SignUp from "./app/SignUp";
-import { ThemeToggle } from "./app/ThemeToggle"
+import { AppHeader, ThemeToggle } from "./app/ThemeToggle"
 import { Routes, Route } from "react-router-dom"
 
 function QrPageLayout() {
     return (
         <div className="min-h-screen bg-background text-foreground">
+            <AppHeader onLogout={handleLogout} />
             <Page />
         </div>
     );
@@ -24,4 +25,5 @@ export function App() {
         </>
     )
 }
+
 export default App

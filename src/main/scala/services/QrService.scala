@@ -58,3 +58,6 @@ final class QrService(qrQueries: QrQueries):
 
     def getQr(user: User, id: UUID): IO[Option[(Array[Byte], Format)]] =
         qrQueries.findById(id, user.id).map(_.map(r => (r.image, r.mimeType)))
+
+    def delete(rowId: UUID, userId: UUID): IO[Unit] =
+        qrQueries.delete(rowId, userId)

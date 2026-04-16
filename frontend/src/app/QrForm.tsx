@@ -29,7 +29,7 @@ export interface QrFormValues {
 const DEFAULT: QrFormValues = {
     url: "",
     ecc: "Medium",
-    format: "PNG",
+    format: "SVG",
     scale: 4,
     border: 4,
     darkColor: "#000000",
